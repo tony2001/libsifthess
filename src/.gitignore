@@ -11,4 +11,5 @@ sifthess_version.h
 sifthess_config.h*
 dspfeat
 match
+match_bench
 siftfeat
