@@ -72,7 +72,7 @@ extern struct kd_node* kdtree_build( struct feature* features, int n );
      -1 on error.
 */
 extern int kdtree_bbf_knn( struct kd_node* kd_root, struct feature* feat,
-			   int k, struct feature*** nbrs, int max_nn_chks );
+			   int k, struct feature** nbrs, int max_nn_chks );
 
 
 /**
@@ -97,7 +97,7 @@ extern int kdtree_bbf_knn( struct kd_node* kd_root, struct feature* feat,
 */
 extern int kdtree_bbf_spatial_knn( struct kd_node* kd_root,
 				   struct feature* feat, int k,
-				   struct feature*** nbrs, int max_nn_chks,
+				   struct feature** nbrs, int max_nn_chks,
 				   CvRect rect, int model );
 
 

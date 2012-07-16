@@ -91,11 +91,11 @@ struct kd_node* kdtree_build( struct feature* features, int n )
     -1 on error.
 */
 int kdtree_bbf_knn( struct kd_node* kd_root, struct feature* feat, int k,
-		    struct feature*** nbrs, int max_nn_chks )
+		    struct feature** nbrs, int max_nn_chks )
 {
   struct kd_node* expl;
   struct min_pq* min_pq;
-  struct feature* tree_feat, ** _nbrs;
+  struct feature* tree_feat;
   struct bbf_data* bbf_data;
   int i, t = 0, n = 0;
 
@@ -106,7 +106,6 @@ int kdtree_bbf_knn( struct kd_node* kd_root, struct feature* feat, int k,
       return -1;
     }
 
-  _nbrs = calloc( k, sizeof( struct feature* ) );
   min_pq = minpq_init();
   minpq_insert( min_pq, kd_root, 0 );
   while( min_pq->n > 0  &&  t < max_nn_chks )
@@ -140,7 +139,7 @@ int kdtree_bbf_knn( struct kd_node* kd_root, struct feature* feat, int k,
 	  bbf_data->old_data = tree_feat->feature_data;
 	  bbf_data->d = descr_dist_sq(feat, tree_feat);
 	  tree_feat->feature_data = bbf_data;
-	  n += insert_into_nbr_array( tree_feat, _nbrs, n, k );
+	  n += insert_into_nbr_array( tree_feat, nbrs, n, k );
 	}
       t++;
     }
@@ -148,23 +147,20 @@ int kdtree_bbf_knn( struct kd_node* kd_root, struct feature* feat, int k,
   minpq_release( &min_pq );
   for( i = 0; i < n; i++ )
     {
-      bbf_data = _nbrs[i]->feature_data;
-      _nbrs[i]->feature_data = bbf_data->old_data;
+      bbf_data = nbrs[i]->feature_data;
+      nbrs[i]->feature_data = bbf_data->old_data;
       free( bbf_data );
     }
-  *nbrs = _nbrs;
   return n;
 
  fail:
   minpq_release( &min_pq );
   for( i = 0; i < n; i++ )
     {
-      bbf_data = _nbrs[i]->feature_data;
-      _nbrs[i]->feature_data = bbf_data->old_data;
+      bbf_data = nbrs[i]->feature_data;
+      nbrs[i]->feature_data = bbf_data->old_data;
       free( bbf_data );
     }
-  free( _nbrs );
-  *nbrs = NULL;
   return -1;
 }
 
@@ -189,15 +185,15 @@ int kdtree_bbf_knn( struct kd_node* kd_root, struct feature* feat, int k,
      \a max_nn_checks keypoint entries).
 */
 int kdtree_bbf_spatial_knn( struct kd_node* kd_root, struct feature* feat,
-			    int k, struct feature*** nbrs, int max_nn_chks,
+			    int k, struct feature** nbrs, int max_nn_chks,
 			    CvRect rect, int model )
 {
-  struct feature** all_nbrs, ** sp_nbrs;
+  struct feature** all_nbrs;
   CvPoint2D64f pt;
   int i, n, t = 0;
 
-  n = kdtree_bbf_knn( kd_root, feat, max_nn_chks, &all_nbrs, max_nn_chks );
-  sp_nbrs = calloc( k, sizeof( struct feature* ) );
+  all_nbrs = calloc(max_nn_chks, sizeof(struct feature*));
+  n = kdtree_bbf_knn( kd_root, feat, max_nn_chks, all_nbrs, max_nn_chks );
   for( i = 0; i < n; i++ )
     {
       if( model )
@@ -207,14 +203,13 @@ int kdtree_bbf_spatial_knn( struct kd_node* kd_root, struct feature* feat,
 
       if( within_rect( pt, rect ) )
 	{
-	  sp_nbrs[t++] = all_nbrs[i];
+	  nbrs[t++] = all_nbrs[i];
 	  if( t == k )
 	    goto end;
 	}
     }
  end:
   free( all_nbrs );
-  *nbrs = sp_nbrs;
   return t;
 }
 

@@ -20,25 +20,13 @@ static void decrease_pq_node_key( struct pq_node*, int, int );
 /************************** Local Inline Functions ***************************/
 
 /* returns the array index of element i's parent */
-static inline int parent( int i )
-{
-  return ( i - 1 ) / 2;
-}
-
+#define parent(i) (((i) - 1) / 2)
 
 /* returns the array index of element i's right child */
-static inline int right( int i )
-{
-  return 2 * i + 2;
-}
-
+#define right(i) (2 * (i) + 2)
 
 /* returns the array index of element i's left child */
-static inline int left( int i )
-{
-  return 2 * i + 1;
-}
-
+#define left(i) (2 * (i) + 1)
 
 /********************** Functions prototyped in minpq.h **********************/
 
@@ -180,17 +168,23 @@ void minpq_release( struct min_pq** min_pq )
 static void decrease_pq_node_key( struct pq_node* pq_array, int i, int key )
 {
   struct pq_node tmp;
+  struct pq_node *pq_array_parent, *pq_array_i;
 
-  if( key > pq_array[i].key )
+  pq_array_i = pq_array + i;
+
+  if( key > pq_array_i->key || i <= 0)
     return;
 
-  pq_array[i].key = key;
-  while( i > 0  &&  pq_array[i].key < pq_array[parent(i)].key )
+  pq_array_i->key = key;
+  pq_array_parent = pq_array + parent(i);
+  while( i > 0  &&  pq_array_i->key < pq_array_parent->key )
     {
-      tmp = pq_array[parent(i)];
-      pq_array[parent(i)] = pq_array[i];
-      pq_array[i] = tmp;
+      tmp = *pq_array_parent;
+      *pq_array_parent = *pq_array_i;
+      *pq_array_i = tmp;
       i = parent(i);
+      pq_array_i = pq_array + i;
+      pq_array_parent = pq_array + parent(i);
     }
 }
 

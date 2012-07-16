@@ -168,7 +168,7 @@ double descr_dist_sq( struct feature* f1, struct feature* f2 )
 
   for( i = 0; i < d; i++ )
     {
-      diff = descr1[i] - descr2[i];
+      diff = *(descr1 + i) - *(descr2 + i);
       dsq += diff*diff;
     }
   return dsq;
