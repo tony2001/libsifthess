@@ -3,8 +3,8 @@ AC_PREREQ(2.61)
 
 AC_INIT([libsifthess],[0.1.0])
 AC_CONFIG_SRCDIR([README])
-AC_CONFIG_SRCDIR(include/sift.h)
-AC_CONFIG_HEADERS(include/sifthess_config.h)
+AC_CONFIG_SRCDIR(src/sift.h)
+AC_CONFIG_HEADERS(src/sifthess_config.h)
 AM_INIT_AUTOMAKE([no-define])
 AM_MAINTAINER_MODE
 
@@ -214,6 +214,6 @@ dnl }}}
 
 AC_SUBST(INSTALL_STRIP_FLAG)
 
-AC_CONFIG_FILES([Makefile src/Makefile include/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
 
