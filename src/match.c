@@ -30,7 +30,7 @@ int main( int argc, char** argv )
 {
   IplImage* img1, * img2, * stacked;
   struct feature* feat1, * feat2, * feat;
-  struct feature** nbrs;
+  struct feature *nbrs[2];
   struct kd_node* kd_root;
   CvPoint pt1, pt2;
   double d0, d1;
@@ -55,7 +55,7 @@ int main( int argc, char** argv )
   for( i = 0; i < n1; i++ )
     {
       feat = feat1 + i;
-      k = kdtree_bbf_knn( kd_root, feat, 2, &nbrs, KDTREE_BBF_MAX_NN_CHKS );
+      k = kdtree_bbf_knn( kd_root, feat, 2, nbrs, KDTREE_BBF_MAX_NN_CHKS );
       if( k == 2 )
 	{
 	  d0 = descr_dist_sq( feat, nbrs[0] );
@@ -70,7 +70,6 @@ int main( int argc, char** argv )
 	      feat1[i].fwd_match = nbrs[0];
 	    }
 	}
-      free( nbrs );
     }
 
   fprintf( stderr, "Found %d total matches\n", m );
